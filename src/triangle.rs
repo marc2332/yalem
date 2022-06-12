@@ -38,7 +38,7 @@ impl From<TriangleBuilder> for Triangle {
 }
 
 impl Widget for Triangle {
-    fn draw(&self, canvas: &mut Canvas, ctx: Context) {
+    fn draw(&mut self, canvas: &mut Canvas, ctx: Context) {
         fn point_in_triangle(center: (f32, f32), radius: f32, radians: f32) -> (f32, f32) {
             (
                 center.0 + radius * radians.cos(),

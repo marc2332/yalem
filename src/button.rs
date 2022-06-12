@@ -80,7 +80,7 @@ impl Widget for Button {
         }
     }
 
-    fn draw(&self, canvas: &mut Canvas, ctx: Context) {
+    fn draw(&mut self, canvas: &mut Canvas, ctx: Context) {
         let mut path = Path::new();
         let mut paint = Paint::default();
 
@@ -123,7 +123,7 @@ impl Widget for Button {
         path.close();
         canvas.draw_path(&path, &paint);
 
-        if let Some(child) = &self.child {
+        if let Some(child) = &mut self.child {
             let size = child_size.unwrap();
             child.draw(
                 canvas,

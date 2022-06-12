@@ -3,11 +3,11 @@ use skia_safe::{Canvas, Color};
 use crate::{Context, StyledWidget, Widget};
 
 pub struct Padding {
-    left: f32,
-    right: f32,
-    bottom: f32,
-    top: f32,
-    child: Option<Box<dyn Widget>>,
+    pub(crate) left: f32,
+    pub(crate) right: f32,
+    pub(crate) bottom: f32,
+    pub(crate) top: f32,
+    pub(crate) child: Option<Box<dyn Widget>>,
 }
 
 pub struct PaddingBuilder {
@@ -66,13 +66,13 @@ impl Widget for Padding {
         )
     }
 
-    fn draw(&self, canvas: &mut Canvas, ctx: Context) {
+    fn draw(&mut self, canvas: &mut Canvas, ctx: Context) {
         let x = ctx.x + self.left;
         let y = ctx.y + self.top;
         let width = ctx.width + self.right + self.left;
         let height = ctx.height + self.top + self.bottom;
 
-        if let Some(child) = &self.child {
+        if let Some(child) = &mut self.child {
             child.draw(
                 canvas,
                 Context {

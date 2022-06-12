@@ -1,89 +1,102 @@
+fn root() -> impl Widget {
+    Stateful::new(|_ctx| {
+        Box::new(Padding::from(
+            PaddingBuilder::new((0.0, 0.0, 0.0, 0.0)).child(List::from(
+                ListBuilder::new()
+                    .child(Text::from(
+                        TextBuilder::new("Yalum Demo").color(Color::BLACK),
+                    ))
+                    .child(Button::from(
+                        ButtonBuilder::new()
+                            .background(Color::RED)
+                            .child(Text::from(
+                                TextBuilder::new("Hello world")
+                                    .color(Color::from_rgb(240, 240, 240)),
+                            )),
+                    ))
+                    .child(Padding::from(
+                        PaddingBuilder::new((0.0, 0.0, 0.0, 0.0)).child(Button::from(
+                            ButtonBuilder::new()
+                                .background(Color::BLACK)
+                                .child(Padding::from(
+                                    PaddingBuilder::new((50.0, 50.0, 25.0, 25.0)).child(
+                                        Text::from(
+                                            TextBuilder::new("wooooow").color(Color::YELLOW),
+                                        ),
+                                    ),
+                                )),
+                        )),
+                    ))
+                    .child(Padding::from(
+                        PaddingBuilder::new((10.0, 10.0, 10.0, 10.0)).child(Button::from(
+                            ButtonBuilder::new()
+                                .background(Color::GREEN)
+                                .child(Padding::from(
+                                    PaddingBuilder::new((50.0, 50.0, 50.0, 50.0)).child(
+                                        Text::from(TextBuilder::new("marc").color(Color::BLACK)),
+                                    ),
+                                )),
+                        )),
+                    ))
+                    .child(Button::from(
+                        ButtonBuilder::new()
+                            .background(Color::MAGENTA)
+                            .child(Expand::from(
+                                ExpandBuilder::new().child(Center::from(
+                                    CenterBuilder::new().child(Text::from(
+                                        TextBuilder::new("Expanded and centered")
+                                            .color(Color::WHITE)
+                                            .set_align(Align::Center),
+                                    )),
+                                )),
+                            )),
+                    )),
+            )),
+        ))
+    })
+}
+
 fn main() {
     yalem::run(
         App::new().with_window(
             Window::new()
                 .with_title("A")
-                .root(Padding::from(
-                    PaddingBuilder::new((0.0, 0.0, 0.0, 0.0)).child(List::from(
-                        ListBuilder::new()
-                            .child(Text::from(
-                                TextBuilder::new("Yalum Demo").color(Color::BLACK),
-                            ))
-                            .child(Button::from(
-                                ButtonBuilder::new()
-                                    .background(Color::RED)
-                                    .child(Text::from(
-                                        TextBuilder::new("Hello WorldAAAAAAAAA")
-                                            .color(Color::from_rgb(240, 240, 240)),
-                                    )),
-                            ))
-                            .child(Padding::from(
-                                PaddingBuilder::new((0.0, 0.0, 0.0, 0.0)).child(Button::from(
-                                    ButtonBuilder::new()
-                                        .background(Color::BLACK)
-                                        .child(Padding::from(
-                                            PaddingBuilder::new((50.0, 50.0, 25.0, 25.0)).child(
-                                                Text::from(
-                                                    TextBuilder::new("Hello Earth")
-                                                        .color(Color::YELLOW),
-                                                ),
-                                            ),
-                                        )),
-                                )),
-                            ))
-                            .child(Padding::from(
-                                PaddingBuilder::new((10.0, 10.0, 10.0, 10.0)).child(Button::from(
-                                    ButtonBuilder::new()
-                                        .background(Color::GREEN)
-                                        .child(Padding::from(
-                                            PaddingBuilder::new((50.0, 50.0, 50.0, 50.0)).child(
-                                                Text::from(
-                                                    TextBuilder::new("marc").color(Color::BLACK),
-                                                ),
-                                            ),
-                                        )),
-                                )),
-                            ))
-                            .child(Button::from(
-                                ButtonBuilder::new()
-                                    .background(Color::MAGENTA)
-                                    .child(Expand::from(ExpandBuilder::new().child(Text::from(
-                                        TextBuilder::new("expanded").color(Color::WHITE),
-                                    )))),
-                            )),
-                    )),
-                )),
+                .root(root()),
         ),
     )
 }
 
 use button::{Button, ButtonBuilder};
+use center::{Center, CenterBuilder};
 use expand::{Expand, ExpandBuilder};
 use glutin::event_loop::EventLoopProxy;
 
 use list::{List, ListBuilder};
 use padding::{Padding, PaddingBuilder};
-use skia_safe::{Canvas, Color};
+use skia_safe::{utils::text_utils::Align, Canvas, Color};
+use stateful::{Stateful};
 use text::{Text, TextBuilder};
 
 mod button;
+mod center;
 mod expand;
 mod list;
 mod padding;
 mod renderer;
+mod stateful;
 mod text;
 mod triangle;
 
 #[derive(Clone, Debug)]
-struct Context {
+pub struct Context {
     x: f32,
     y: f32,
     width: f32,
     height: f32,
 }
 
-trait Widget {
-    fn draw(&self, canvas: &mut Canvas, context: Context);
+pub trait Widget {
+    fn draw(&mut self, canvas: &mut Canvas, context: Context);
 
     fn get_size(&self, _ctx: Context) -> (f32, f32) {
         (50.0, 50.0)
@@ -121,8 +134,8 @@ struct Window {
 }
 
 impl Widget for Window {
-    fn draw(&self, canvas: &mut Canvas, ctx: Context) {
-        if let Some(root) = &self.root {
+    fn draw(&mut self, canvas: &mut Canvas, ctx: Context) {
+        if let Some(root) = &mut self.root {
             root.draw(canvas, ctx.clone());
         }
     }

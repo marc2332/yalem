@@ -30,9 +30,9 @@ impl From<ListBuilder> for List {
 }
 
 impl Widget for List {
-    fn draw(&self, canvas: &mut Canvas, ctx: Context) {
+    fn draw(&mut self, canvas: &mut Canvas, ctx: Context) {
         let mut prev_pos_y = ctx.y;
-        for child in self.children.iter() {
+        for child in self.children.iter_mut() {
             child.draw(
                 canvas,
                 Context {

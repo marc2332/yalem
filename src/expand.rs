@@ -34,9 +34,16 @@ impl Widget for Expand {
         (ctx.width, ctx.height)
     }
 
-    fn draw(&self, canvas: &mut Canvas, ctx: Context) {
-        if let Some(child) = &self.child {
-            child.draw(canvas, ctx)
+    fn draw(&mut self, canvas: &mut Canvas, ctx: Context) {
+        if let Some(child) = &mut self.child {
+            child.draw(
+                canvas,
+                Context {
+                    height: ctx.height - ctx.y,
+                    width: ctx.width - ctx.x,
+                    ..ctx
+                },
+            )
         }
     }
 }
