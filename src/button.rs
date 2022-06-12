@@ -1,21 +1,17 @@
-use std::cmp::min;
-
-use skia_safe::{Canvas, Color, Paint, PaintJoin, PaintStyle, Path, Rect};
+use skia_safe::{Canvas, Color, Paint, PaintStyle, Path};
 
 use crate::{Context, StyledWidget, Widget};
 
 pub struct Button {
     background_color: Color,
-    padding: f32,
-    children: Vec<Box<dyn Widget>>,
+    child: Option<Box<dyn Widget>>,
     width: f32,
     height: f32,
 }
 
 pub struct ButtonBuilder {
     background_color: Color,
-    padding: f32,
-    children: Vec<Box<dyn Widget>>,
+    child: Option<Box<dyn Widget>>,
     width: f32,
     height: f32,
 }
@@ -24,15 +20,14 @@ impl ButtonBuilder {
     pub fn new() -> Self {
         Self {
             background_color: Color::TRANSPARENT,
-            padding: 5.0,
-            children: vec![],
+            child: None,
             width: 5.0,
             height: 5.0,
         }
     }
 
     pub fn child(mut self, child: impl Widget + 'static) -> Self {
-        self.children.push(Box::new(child));
+        self.child = Some(Box::new(child));
         self
     }
 
@@ -51,8 +46,7 @@ impl From<ButtonBuilder> for Button {
     fn from(button_builder: ButtonBuilder) -> Self {
         Self {
             background_color: button_builder.background_color,
-            padding: button_builder.padding,
-            children: button_builder.children,
+            child: button_builder.child,
             width: button_builder.width,
             height: button_builder.height,
         }
@@ -60,6 +54,32 @@ impl From<ButtonBuilder> for Button {
 }
 
 impl Widget for Button {
+    fn get_size(&self, ctx: Context) -> (f32, f32) {
+        let x = ctx.x;
+        let y = ctx.y;
+        let mut width = ctx.x;
+        let mut height = ctx.y;
+
+        let inner_x = x;
+        let inner_y = y;
+
+        if let Some(child) = &self.child {
+            let size = child.get_size(Context {
+                x: inner_x,
+                y: inner_y,
+                width: ctx.width,
+                height: ctx.height,
+            });
+
+            size
+        } else {
+            width += self.width;
+            height += self.height;
+
+            (width, height)
+        }
+    }
+
     fn draw(&self, canvas: &mut Canvas, ctx: Context) {
         let mut path = Path::new();
         let mut paint = Paint::default();
@@ -70,13 +90,30 @@ impl Widget for Button {
 
         let x = ctx.x;
         let y = ctx.y;
-        let mut width = ctx.x + self.width; // This could cause overflow
-        let mut height = ctx.y + self.height; // This could cause overflow
+        let mut width = ctx.x;
+        let mut height = ctx.y;
 
-        width += self.padding;
-        height += self.padding;
+        let inner_x = x;
+        let inner_y = y;
 
-        println!("{x}-{y}-{width}-{height}");
+        let child_size = if let Some(child) = &self.child {
+            let size = child.get_size(Context {
+                x: inner_x,
+                y: inner_y,
+                width: ctx.width,
+                height: ctx.height,
+            });
+
+            width += size.0;
+            height += size.1;
+
+            Some(size)
+        } else {
+            width += self.width;
+            height += self.height;
+
+            None
+        };
 
         path.move_to((x, y));
         path.line_to((width, y));
@@ -86,17 +123,15 @@ impl Widget for Button {
         path.close();
         canvas.draw_path(&path, &paint);
 
-        let inner_x = x + (self.padding / 2.0);
-        let inner_y = y + (self.padding / 2.0);
-
-        for child in &self.children {
+        if let Some(child) = &self.child {
+            let size = child_size.unwrap();
             child.draw(
                 canvas,
                 Context {
                     x: inner_x,
                     y: inner_y,
-                    width: 100.0,
-                    height: 25.0,
+                    width: size.0,
+                    height: size.1,
                 },
             );
         }
@@ -109,7 +144,7 @@ impl StyledWidget for ButtonBuilder {
         self
     }
 
-    fn color(mut self, color: Color) -> Self {
+    fn color(self, _color: Color) -> Self {
         self
     }
 }

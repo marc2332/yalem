@@ -31,16 +31,25 @@ impl From<ListBuilder> for List {
 
 impl Widget for List {
     fn draw(&self, canvas: &mut Canvas, ctx: Context) {
-        for (i, child) in self.children.iter().enumerate() {
+        let mut prev_pos_y = ctx.y;
+        for child in self.children.iter() {
             child.draw(
                 canvas,
                 Context {
                     x: ctx.x,
-                    y: ctx.y + ((i as f32) * 60.0),
+                    y: prev_pos_y,
                     width: ctx.width,
-                    height: 20.0,
+                    height: ctx.height,
                 },
-            )
+            );
+            prev_pos_y += child
+                .get_size(Context {
+                    x: ctx.x,
+                    y: prev_pos_y,
+                    width: ctx.width,
+                    height: ctx.height,
+                })
+                .1;
         }
     }
 }

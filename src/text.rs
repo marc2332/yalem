@@ -36,6 +36,20 @@ impl From<TextBuilder> for Text {
 }
 
 impl Widget for Text {
+    fn get_size(&self, ctx: Context) -> (f32, f32) {
+        let size_char = (5.5, 10.0);
+        let mut width = (self.text.len() as f32) * size_char.0;
+        let mut height = size_char.1;
+
+        // break 1 line for now
+        if width > ctx.width {
+            width = ctx.width;
+            height *= 2.0;
+        }
+
+        (width, height)
+    }
+
     fn draw(&self, canvas: &mut Canvas, ctx: Context) {
         let font = Font::default();
         let text_blob = TextBlob::new(&self.text, &font);
@@ -47,11 +61,9 @@ impl Widget for Text {
         paint.set_color(self.color);
 
         let x = ctx.x;
-        let y = ctx.y + 3.0;
+        let y = ctx.y + 9.0;
 
         canvas.draw_text_blob(&text_blob.unwrap(), (x, y), &paint);
-
-        println!("DONE");
     }
 }
 

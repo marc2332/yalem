@@ -4,30 +4,25 @@ fn main() {
             Window::new()
                 .with_title("A")
                 .root(Padding::from(
-                    PaddingBuilder::new((10.0, 10.0, 10.0, 10.0)).child(List::from(
+                    PaddingBuilder::new((0.0, 0.0, 0.0, 0.0)).child(List::from(
                         ListBuilder::new()
+                            .child(Text::from(
+                                TextBuilder::new("Yalum Demo").color(Color::BLACK),
+                            ))
                             .child(Button::from(
                                 ButtonBuilder::new()
                                     .background(Color::RED)
-                                    .width(80.0)
-                                    .height(20.0)
-                                    .child(Padding::from(
-                                        PaddingBuilder::new((10.0, 10.0, 10.0, 10.0)).child(
-                                            Text::from(
-                                                TextBuilder::new("Hello World")
-                                                    .color(Color::from_rgb(240, 240, 240)),
-                                            ),
-                                        ),
+                                    .child(Text::from(
+                                        TextBuilder::new("Hello WorldAAAAAAAAA")
+                                            .color(Color::from_rgb(240, 240, 240)),
                                     )),
                             ))
                             .child(Padding::from(
-                                PaddingBuilder::new((10.0, 10.0, 10.0, 10.0)).child(Button::from(
+                                PaddingBuilder::new((0.0, 0.0, 0.0, 0.0)).child(Button::from(
                                     ButtonBuilder::new()
                                         .background(Color::BLACK)
-                                        .width(100.0)
-                                        .height(30.0)
                                         .child(Padding::from(
-                                            PaddingBuilder::new((20.0, 20.0, 15.0, 15.0)).child(
+                                            PaddingBuilder::new((50.0, 50.0, 25.0, 25.0)).child(
                                                 Text::from(
                                                     TextBuilder::new("Hello Earth")
                                                         .color(Color::YELLOW),
@@ -35,6 +30,26 @@ fn main() {
                                             ),
                                         )),
                                 )),
+                            ))
+                            .child(Padding::from(
+                                PaddingBuilder::new((10.0, 10.0, 10.0, 10.0)).child(Button::from(
+                                    ButtonBuilder::new()
+                                        .background(Color::GREEN)
+                                        .child(Padding::from(
+                                            PaddingBuilder::new((50.0, 50.0, 50.0, 50.0)).child(
+                                                Text::from(
+                                                    TextBuilder::new("marc").color(Color::BLACK),
+                                                ),
+                                            ),
+                                        )),
+                                )),
+                            ))
+                            .child(Button::from(
+                                ButtonBuilder::new()
+                                    .background(Color::MAGENTA)
+                                    .child(Expand::from(ExpandBuilder::new().child(Text::from(
+                                        TextBuilder::new("expanded").color(Color::WHITE),
+                                    )))),
                             )),
                     )),
                 )),
@@ -43,6 +58,7 @@ fn main() {
 }
 
 use button::{Button, ButtonBuilder};
+use expand::{Expand, ExpandBuilder};
 use glutin::event_loop::EventLoopProxy;
 
 use list::{List, ListBuilder};
@@ -51,13 +67,14 @@ use skia_safe::{Canvas, Color};
 use text::{Text, TextBuilder};
 
 mod button;
+mod expand;
 mod list;
 mod padding;
 mod renderer;
 mod text;
 mod triangle;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct Context {
     x: f32,
     y: f32,
@@ -67,6 +84,10 @@ struct Context {
 
 trait Widget {
     fn draw(&self, canvas: &mut Canvas, context: Context);
+
+    fn get_size(&self, _ctx: Context) -> (f32, f32) {
+        (50.0, 50.0)
+    }
 }
 
 trait StyledWidget {
@@ -173,6 +194,10 @@ mod yalem {
 
         impl Env {
             pub fn redraw(&mut self) {
+                let win_size = self
+                    .windowed_context
+                    .window()
+                    .inner_size();
                 let canvas = self.surface.canvas();
                 canvas.clear(Color::WHITE);
                 self.yalem_window.draw(
@@ -180,8 +205,8 @@ mod yalem {
                     Context {
                         x: 0.0,
                         y: 0.0,
-                        height: 0.0,
-                        width: 0.0,
+                        height: win_size.height as f32,
+                        width: win_size.width as f32,
                     },
                 );
                 self.surface.canvas();
@@ -320,7 +345,10 @@ mod yalem {
                                 .resize(physical_size)
                         }
                     }
-                    WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
+                    WindowEvent::CloseRequested => {
+                        // should only remove one window
+                        *control_flow = ControlFlow::Exit
+                    }
                     WindowEvent::KeyboardInput {
                         input:
                             KeyboardInput {

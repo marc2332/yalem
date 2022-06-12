@@ -48,11 +48,29 @@ impl From<PaddingBuilder> for Padding {
 }
 
 impl Widget for Padding {
+    fn get_size(&self, ctx: Context) -> (f32, f32) {
+        let child = self.child.as_ref().unwrap();
+        let width = ctx.width + self.right + self.left;
+        let height = ctx.height + self.top + self.bottom;
+
+        let child_size = child.get_size(Context {
+            x: ctx.x,
+            y: ctx.y,
+            width,
+            height,
+        });
+
+        (
+            child_size.0 + self.right + self.left,
+            child_size.1 + self.top + self.bottom,
+        )
+    }
+
     fn draw(&self, canvas: &mut Canvas, ctx: Context) {
         let x = ctx.x + self.left;
         let y = ctx.y + self.top;
-        let width = ctx.width - self.right;
-        let height = ctx.height - self.bottom;
+        let width = ctx.width + self.right + self.left;
+        let height = ctx.height + self.top + self.bottom;
 
         if let Some(child) = &self.child {
             child.draw(
