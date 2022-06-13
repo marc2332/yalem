@@ -12,6 +12,12 @@ pub struct Button {
     positions: (f64, f64, f64, f64),
 }
 
+impl Button {
+    pub fn builder() -> ButtonBuilder {
+        ButtonBuilder::new()
+    }
+}
+
 pub struct ButtonBuilder {
     background_color: Color,
     child: Option<Box<dyn Widget>>,
@@ -29,6 +35,10 @@ impl ButtonBuilder {
             height: None,
             callback: None,
         }
+    }
+
+    pub fn build(self) -> Button {
+        Button::from(self)
     }
 
     pub fn child(mut self, child: impl Widget + 'static) -> Self {

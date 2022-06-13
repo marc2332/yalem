@@ -11,6 +11,12 @@ pub struct Padding {
     pub(crate) child: Option<Box<dyn Widget>>,
 }
 
+impl Padding {
+    pub fn builder(positions: (f32, f32, f32, f32)) -> PaddingBuilder {
+        PaddingBuilder::new(positions)
+    }
+}
+
 pub struct PaddingBuilder {
     left: f32,
     right: f32,
@@ -28,6 +34,10 @@ impl PaddingBuilder {
             top,
             child: None,
         }
+    }
+
+    pub fn build(self) -> Padding {
+        Padding::from(self)
     }
 
     pub fn child(mut self, child: impl Widget + 'static) -> Self {

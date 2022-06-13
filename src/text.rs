@@ -10,6 +10,12 @@ pub struct Text {
     align: Align,
 }
 
+impl Text {
+    pub fn builder(text: impl Into<String>) -> TextBuilder {
+        TextBuilder::new(text)
+    }
+}
+
 pub struct TextBuilder {
     color: Color,
     text: String,
@@ -23,6 +29,10 @@ impl TextBuilder {
             text: text.into(),
             align: Align::Left,
         }
+    }
+
+    pub fn build(self) -> Text {
+        Text::from(self)
     }
 
     pub fn align(mut self, align: Align) -> Self {

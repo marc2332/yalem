@@ -16,6 +16,12 @@ pub struct Center {
     direction: Direction,
 }
 
+impl Center {
+    pub fn builder() -> CenterBuilder {
+        CenterBuilder::new()
+    }
+}
+
 pub struct CenterBuilder {
     child: Box<Padding>,
     direction: Direction,
@@ -33,6 +39,10 @@ impl CenterBuilder {
             }),
             direction: Direction::Horizontal,
         }
+    }
+
+    pub fn build(self) -> Center {
+        Center::from(self)
     }
 
     pub fn child(mut self, child: impl Widget + 'static) -> Self {

@@ -87,60 +87,78 @@ static COUNTER: state::LocalStorage<Cell<u16>> = state::LocalStorage::new();
 fn main() {
     COUNTER.set(|| Cell::new(1));
 
+    fn counter() -> impl Widget {
+        Stateful::new(|_| {
+            Box::new(
+                Button::builder()
+                    .child(
+                        Expand::builder()
+                            .child(
+                                Center::builder()
+                                    .child(
+                                        Padding::builder((0.0, 0.0, 10.0, 0.0))
+                                            .child(
+                                                Text::builder(format!(
+                                                    "Counter -> {}",
+                                                    COUNTER.get().get()
+                                                ))
+                                                .align(Align::Center)
+                                                .color(Color::BLACK)
+                                                .build(),
+                                            )
+                                            .build(),
+                                    )
+                                    .direction(Direction::Both)
+                                    .build(),
+                            )
+                            .direction(Direction::Horizontal)
+                            .build(),
+                    )
+                    .height(50.0)
+                    .build(),
+            )
+        })
+    }
+
+    fn increment() -> impl Widget {
+        Button::builder()
+            .child(
+                Expand::builder()
+                    .child(
+                        Center::builder()
+                            .child(
+                                Padding::builder((0.0, 0.0, 20.0, 0.0))
+                                    .child(
+                                        Text::builder("Click me")
+                                            .color(Color::YELLOW)
+                                            .align(Align::Center)
+                                            .build(),
+                                    )
+                                    .build(),
+                            )
+                            .build(),
+                    )
+                    .build(),
+            )
+            .background(Color::BLACK)
+            .on_click(|| {
+                let count = COUNTER.get();
+                count.set(count.get() + 1);
+            })
+            .height(50.0)
+            .build()
+    }
+
     yalem::run(
         App::new().with_window(
             Window::new()
                 .with_title("Yalum Demo")
-                .root(List::from(
-                    ListBuilder::new()
-                        .child(Stateful::new(|_| {
-                            Box::new(Button::from(
-                                ButtonBuilder::new()
-                                    .child(Expand::from(
-                                        ExpandBuilder::new()
-                                            .child(Center::from(
-                                                CenterBuilder::new()
-                                                    .child(Padding::from(
-                                                        PaddingBuilder::new((0.0, 0.0, 10.0, 0.0))
-                                                            .child(Text::from(
-                                                                TextBuilder::new(format!(
-                                                                    "Counter -> {}",
-                                                                    COUNTER.get().get()
-                                                                ))
-                                                                .align(Align::Center)
-                                                                .color(Color::BLACK),
-                                                            )),
-                                                    ))
-                                                    .direction(Direction::Both),
-                                            ))
-                                            .direction(Direction::Horizontal),
-                                    ))
-                                    .height(50.0),
-                            ))
-                        }))
-                        .child(Button::from(
-                            ButtonBuilder::new()
-                                .child(Expand::from(
-                                    ExpandBuilder::new().child(Center::from(
-                                        CenterBuilder::new().child(Padding::from(
-                                            PaddingBuilder::new((0.0, 0.0, 20.0, 0.0)).child(
-                                                Text::from(
-                                                    TextBuilder::new("Click me")
-                                                        .color(Color::YELLOW)
-                                                        .align(Align::Center),
-                                                ),
-                                            ),
-                                        )),
-                                    )),
-                                ))
-                                .background(Color::BLACK)
-                                .on_click(|| {
-                                    let count = COUNTER.get();
-                                    count.set(count.get() + 1);
-                                })
-                                .height(50.0),
-                        )),
-                )),
+                .root(
+                    List::builder()
+                        .child(counter())
+                        .child(increment())
+                        .build(),
+                ),
         ),
     )
 }

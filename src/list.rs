@@ -7,6 +7,12 @@ pub struct List {
     children: Vec<Box<dyn Widget>>,
 }
 
+impl List {
+    pub fn builder() -> ListBuilder {
+        ListBuilder::new()
+    }
+}
+
 pub struct ListBuilder {
     children: Vec<Box<dyn Widget>>,
 }
@@ -14,6 +20,10 @@ pub struct ListBuilder {
 impl ListBuilder {
     pub fn new() -> Self {
         Self { children: vec![] }
+    }
+
+    pub fn build(self) -> List {
+        List::from(self)
     }
 
     pub fn child(mut self, child: impl Widget + 'static) -> Self {

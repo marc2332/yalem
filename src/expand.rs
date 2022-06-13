@@ -8,6 +8,12 @@ pub struct Expand {
     direction: Direction,
 }
 
+impl Expand {
+    pub fn builder() -> ExpandBuilder {
+        ExpandBuilder::new()
+    }
+}
+
 pub struct ExpandBuilder {
     child: Option<Box<dyn Widget>>,
     direction: Direction,
@@ -19,6 +25,10 @@ impl ExpandBuilder {
             child: None,
             direction: Direction::Horizontal,
         }
+    }
+
+    pub fn build(self) -> Expand {
+        Expand::from(self)
     }
 
     pub fn child(mut self, child: impl Widget + 'static) -> Self {
