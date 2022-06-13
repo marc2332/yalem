@@ -1,6 +1,7 @@
+use glutin::event::WindowEvent;
 use skia_safe::{Canvas, Color};
 
-use crate::{center::Direction, Context, Widget};
+use crate::{center::Direction, Context, Widget, YalemEvent};
 
 pub struct Expand {
     child: Option<Box<dyn Widget>>,
@@ -41,6 +42,12 @@ impl From<ExpandBuilder> for Expand {
 }
 
 impl Widget for Expand {
+    fn send_event(&mut self, event: &YalemEvent) {
+        if let Some(child) = &mut self.child {
+            child.send_event(&event)
+        }
+    }
+
     fn get_size(&self, ctx: Context) -> (f32, f32) {
         if let Some(child) = &self.child {
             let child_size = child.get_size(ctx.clone());

@@ -7,3 +7,4 @@ version = "0.1.0"
 gl = "*"
 glutin = "*"
 skia-safe = { version = "*", features = ["gl"] }
+state = { version = "0.5", features = ["tls"] }

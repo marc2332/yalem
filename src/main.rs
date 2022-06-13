@@ -4,102 +4,156 @@
 )]
 
 fn stuff() -> impl Widget {
-    Stateful::new(|_ctx| {
-        Box::new(Padding::from(
-            PaddingBuilder::new((0.0, 0.0, 0.0, 0.0)).child(List::from(
-                ListBuilder::new()
-                    .child(Text::from(
-                        TextBuilder::new("Yalum Demo").color(Color::BLACK),
-                    ))
-                    .child(Button::from(
+    Padding::from(
+        PaddingBuilder::new((0.0, 0.0, 0.0, 0.0)).child(List::from(
+            ListBuilder::new()
+                .child(Text::from(
+                    TextBuilder::new("Yalum Demo").color(Color::BLACK),
+                ))
+                .child(Button::from(
+                    ButtonBuilder::new()
+                        .background(Color::RED)
+                        .child(Expand::from(ExpandBuilder::new().child(Text::from(
+                            TextBuilder::new("Expanded").color(Color::from_rgb(240, 240, 240)),
+                        )))),
+                ))
+                .child(Button::from(
+                    ButtonBuilder::new()
+                        .background(Color::BLUE)
+                        .child(Text::from(
+                            TextBuilder::new("Fixed width and height")
+                                .color(Color::from_rgb(240, 240, 240)),
+                        ))
+                        .width(200.0)
+                        .height(50.0),
+                ))
+                .child(Padding::from(
+                    PaddingBuilder::new((0.0, 0.0, 0.0, 0.0)).child(Button::from(
                         ButtonBuilder::new()
-                            .background(Color::RED)
-                            .child(Expand::from(ExpandBuilder::new().child(Text::from(
-                                TextBuilder::new("Expanded").color(Color::from_rgb(240, 240, 240)),
-                            )))),
-                    ))
-                    .child(Button::from(
-                        ButtonBuilder::new()
-                            .background(Color::BLUE)
-                            .child(Text::from(
-                                TextBuilder::new("Fixed width and height")
-                                    .color(Color::from_rgb(240, 240, 240)),
-                            ))
-                            .width(200.0)
-                            .height(50.0),
-                    ))
-                    .child(Padding::from(
-                        PaddingBuilder::new((0.0, 0.0, 0.0, 0.0)).child(Button::from(
-                            ButtonBuilder::new()
-                                .background(Color::BLACK)
-                                .child(Padding::from(
-                                    PaddingBuilder::new((50.0, 50.0, 25.0, 25.0)).child(
-                                        Text::from(
-                                            TextBuilder::new("Fixed paddings").color(Color::YELLOW),
-                                        ),
-                                    ),
+                            .background(Color::BLACK)
+                            .child(Padding::from(
+                                PaddingBuilder::new((50.0, 50.0, 25.0, 25.0)).child(Text::from(
+                                    TextBuilder::new("Fixed paddings").color(Color::YELLOW),
                                 )),
-                        )),
-                    ))
-                    .child(Padding::from(
-                        PaddingBuilder::new((10.0, 10.0, 10.0, 10.0)).child(Button::from(
-                            ButtonBuilder::new()
-                                .background(Color::GREEN)
-                                .child(Expand::from(
-                                    ExpandBuilder::new().child(Center::from(
-                                        CenterBuilder::new().child(Text::from(
-                                            TextBuilder::new(
-                                                "Expanded horizontally + centered + paddings",
-                                            )
-                                            .color(Color::BLACK)
-                                            .align(Align::Center),
-                                        )),
-                                    )),
-                                )),
-                        )),
-                    ))
-                    .child(Button::from(
-                        ButtonBuilder::new()
-                            .background(Color::MAGENTA)
-                            .child(Expand::from(
-                                ExpandBuilder::new()
-                                    .child(Center::from(
-                                        CenterBuilder::new()
-                                            .child(List::from(
-                                                ListBuilder::new()
-                                                    .child(Text::from(
-                                                        TextBuilder::new(
-                                                            "Expanded both sides and centered",
-                                                        )
-                                                        .color(Color::BLACK)
-                                                        .align(Align::Center),
-                                                    ))
-                                                    .child(Triangle::from(TriangleBuilder::new())),
-                                            ))
-                                            .direction(Direction::Both),
-                                    ))
-                                    .direction(Direction::Both),
                             )),
                     )),
-            )),
-        ))
-    })
+                ))
+                .child(Padding::from(
+                    PaddingBuilder::new((10.0, 10.0, 10.0, 10.0)).child(Button::from(
+                        ButtonBuilder::new()
+                            .background(Color::GREEN)
+                            .child(Expand::from(
+                                ExpandBuilder::new().child(Center::from(
+                                    CenterBuilder::new().child(Text::from(
+                                        TextBuilder::new(
+                                            "Expanded horizontally + centered + paddings",
+                                        )
+                                        .color(Color::BLACK)
+                                        .align(Align::Center),
+                                    )),
+                                )),
+                            )),
+                    )),
+                ))
+                .child(Button::from(
+                    ButtonBuilder::new()
+                        .background(Color::MAGENTA)
+                        .child(Expand::from(
+                            ExpandBuilder::new()
+                                .child(Center::from(
+                                    CenterBuilder::new()
+                                        .child(List::from(
+                                            ListBuilder::new()
+                                                .child(Text::from(
+                                                    TextBuilder::new(
+                                                        "Expanded both sides and centered",
+                                                    )
+                                                    .color(Color::BLACK)
+                                                    .align(Align::Center),
+                                                ))
+                                                .child(Triangle::from(TriangleBuilder::new())),
+                                        ))
+                                        .direction(Direction::Both),
+                                ))
+                                .direction(Direction::Both),
+                        )),
+                )),
+        )),
+    )
 }
 
+static COUNTER: state::LocalStorage<Cell<u16>> = state::LocalStorage::new();
+
 fn main() {
+    COUNTER.set(|| Cell::new(1));
+
     yalem::run(
         App::new().with_window(
             Window::new()
                 .with_title("Yalum Demo")
-                .root(stuff()),
+                .root(List::from(
+                    ListBuilder::new()
+                        .child(Stateful::new(|_| {
+                            Box::new(Button::from(
+                                ButtonBuilder::new()
+                                    .child(Expand::from(
+                                        ExpandBuilder::new()
+                                            .child(Center::from(
+                                                CenterBuilder::new()
+                                                    .child(Padding::from(
+                                                        PaddingBuilder::new((0.0, 0.0, 10.0, 0.0))
+                                                            .child(Text::from(
+                                                                TextBuilder::new(format!(
+                                                                    "Counter -> {}",
+                                                                    COUNTER.get().get()
+                                                                ))
+                                                                .align(Align::Center)
+                                                                .color(Color::BLACK),
+                                                            )),
+                                                    ))
+                                                    .direction(Direction::Both),
+                                            ))
+                                            .direction(Direction::Horizontal),
+                                    ))
+                                    .height(50.0),
+                            ))
+                        }))
+                        .child(Button::from(
+                            ButtonBuilder::new()
+                                .child(Expand::from(
+                                    ExpandBuilder::new().child(Center::from(
+                                        CenterBuilder::new().child(Padding::from(
+                                            PaddingBuilder::new((0.0, 0.0, 20.0, 0.0)).child(
+                                                Text::from(
+                                                    TextBuilder::new("Click me")
+                                                        .color(Color::YELLOW)
+                                                        .align(Align::Center),
+                                                ),
+                                            ),
+                                        )),
+                                    )),
+                                ))
+                                .background(Color::BLACK)
+                                .on_click(|| {
+                                    let count = COUNTER.get();
+                                    count.set(count.get() + 1);
+                                })
+                                .height(50.0),
+                        )),
+                )),
         ),
     )
 }
 
+use std::cell::Cell;
+
 use button::{Button, ButtonBuilder};
 use center::{Center, CenterBuilder, Direction};
 use expand::{Expand, ExpandBuilder};
-use glutin::event_loop::EventLoopProxy;
+use glutin::{
+    event::{MouseButton, WindowEvent},
+    event_loop::EventLoopProxy,
+};
 
 use list::{List, ListBuilder};
 use padding::{Padding, PaddingBuilder};
@@ -126,6 +180,8 @@ pub struct Context {
 }
 
 pub trait Widget {
+    fn send_event(&mut self, event: &YalemEvent) {}
+
     fn draw(&mut self, canvas: &mut Canvas, context: Context);
 
     fn get_size(&self, ctx: Context) -> (f32, f32) {
@@ -188,6 +244,24 @@ impl Window {
         self.root = Some(Box::new(child));
         self
     }
+
+    fn send_event(&mut self, event: &YalemEvent) {
+        if let Some(child) = &mut self.root {
+            child.send_event(&event)
+        }
+    }
+}
+
+pub enum YalemMouse {
+    Pressed {
+        button: MouseButton,
+        position: (f64, f64),
+    },
+}
+
+pub enum YalemEvent<'a> {
+    YalemMouse(YalemMouse),
+    Winit(WindowEvent<'a>),
 }
 
 mod yalem {
@@ -196,6 +270,7 @@ mod yalem {
 
     use gl::types::*;
     use glutin::dpi::PhysicalSize;
+    use glutin::event::{DeviceEvent, ElementState, MouseButton};
     use glutin::window::WindowId;
     use glutin::{
         event::{Event, KeyboardInput, VirtualKeyCode, WindowEvent},
@@ -209,7 +284,7 @@ mod yalem {
         ColorType, Surface,
     };
 
-    use crate::{App, Context, Widget, Window as AppWindow};
+    use crate::{button, App, Context, Widget, Window as AppWindow, YalemEvent, YalemMouse};
 
     pub fn run(app: App) {
         type WindowedContext =
@@ -364,6 +439,8 @@ mod yalem {
             win
         };
 
+        let mut cursor_pos = (0.0, 0.0);
+
         el.run(move |event, _, control_flow| {
             *control_flow = ControlFlow::Wait;
 
@@ -371,6 +448,27 @@ mod yalem {
             match event {
                 Event::LoopDestroyed => {}
                 Event::WindowEvent { event, window_id } => match event {
+                    WindowEvent::CursorMoved {
+                        device_id,
+                        modifiers,
+                        position,
+                    } => {
+                        cursor_pos = (position.x, position.y);
+                    }
+                    WindowEvent::MouseInput { button, state, .. } => {
+                        if ElementState::Pressed == state {
+                            let result = get_window_context(window_id);
+                            if let Some(env) = result {
+                                let mut env = env.lock().unwrap();
+                                env.yalem_window
+                                    .send_event(&YalemEvent::YalemMouse(YalemMouse::Pressed {
+                                        position: cursor_pos,
+                                        button,
+                                    }));
+                                env.redraw();
+                            }
+                        }
+                    }
                     WindowEvent::Resized(physical_size) => {
                         let result = get_window_context(window_id);
                         if let Some(env) = result {

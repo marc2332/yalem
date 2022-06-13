@@ -25,6 +25,15 @@ impl Stateful {
 }
 
 impl Widget for Stateful {
+    /*
+
+        fn send_event(&self, event: &WindowEvent) {
+        if let Some(child) = &self.root {
+            child.send_event(&event)
+        }
+    }
+    */
+
     fn get_size(&self, ctx: Context) -> (f32, f32) {
         (self.render)(&self.state_ctx).get_size(ctx)
     }

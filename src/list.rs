@@ -1,6 +1,7 @@
+use glutin::event::WindowEvent;
 use skia_safe::{Canvas, Color};
 
-use crate::{Context, Widget};
+use crate::{Context, Widget, YalemEvent};
 
 pub struct List {
     children: Vec<Box<dyn Widget>>,
@@ -30,6 +31,12 @@ impl From<ListBuilder> for List {
 }
 
 impl Widget for List {
+    fn send_event(&mut self, event: &YalemEvent) {
+        for child in &mut self.children {
+            child.send_event(event);
+        }
+    }
+
     fn get_size(&self, ctx: Context) -> (f32, f32) {
         let mut prev_pos_y = ctx.y;
         let max_pos = ctx.y + ctx.height;

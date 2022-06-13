@@ -1,6 +1,7 @@
+use glutin::event::WindowEvent;
 use skia_safe::{Canvas, Color};
 
-use crate::{Context, Widget};
+use crate::{Context, Widget, YalemEvent};
 
 pub struct Padding {
     pub(crate) left: f32,
@@ -19,7 +20,7 @@ pub struct PaddingBuilder {
 }
 
 impl PaddingBuilder {
-    pub fn new((left, right, bottom, top): (f32, f32, f32, f32)) -> Self {
+    pub fn new((left, right, top, bottom): (f32, f32, f32, f32)) -> Self {
         Self {
             left,
             right,
@@ -48,6 +49,12 @@ impl From<PaddingBuilder> for Padding {
 }
 
 impl Widget for Padding {
+    fn send_event(&mut self, event: &YalemEvent) {
+        if let Some(child) = &mut self.child {
+            child.send_event(&event)
+        }
+    }
+
     fn get_size(&self, ctx: Context) -> (f32, f32) {
         let child = self.child.as_ref().unwrap();
         let mut width = ctx.width - self.right - self.left;

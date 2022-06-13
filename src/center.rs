@@ -1,8 +1,9 @@
 use std::borrow::Borrow;
 
+use glutin::event::WindowEvent;
 use skia_safe::{Canvas, Color};
 
-use crate::{padding::Padding, Context, Widget};
+use crate::{padding::Padding, Context, Widget, YalemEvent};
 
 pub enum Direction {
     Horizontal,
@@ -11,25 +12,25 @@ pub enum Direction {
 }
 
 pub struct Center {
-    child: Padding,
+    child: Box<Padding>,
     direction: Direction,
 }
 
 pub struct CenterBuilder {
-    child: Padding,
+    child: Box<Padding>,
     direction: Direction,
 }
 
 impl CenterBuilder {
     pub fn new() -> Self {
         Self {
-            child: Padding {
+            child: Box::new(Padding {
                 left: 0.0,
                 right: 0.0,
                 bottom: 0.0,
                 top: 0.0,
                 child: None,
-            },
+            }),
             direction: Direction::Horizontal,
         }
     }
@@ -55,6 +56,10 @@ impl From<CenterBuilder> for Center {
 }
 
 impl Widget for Center {
+    fn send_event(&mut self, event: &YalemEvent) {
+        self.child.send_event(event);
+    }
+
     fn get_size(&self, ctx: Context) -> (f32, f32) {
         self.child.get_size(ctx)
     }
