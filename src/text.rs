@@ -2,7 +2,7 @@ use skia_safe::{
     utils::text_utils::Align, Canvas, Color, Font, FontStyle, Paint, PaintStyle, Path, TextBlob,
 };
 
-use crate::{Context, StyledWidget, Widget};
+use crate::{Context, Widget};
 
 pub struct Text {
     color: Color,
@@ -25,8 +25,13 @@ impl TextBuilder {
         }
     }
 
-    pub fn set_align(mut self, align: Align) -> Self {
+    pub fn align(mut self, align: Align) -> Self {
         self.align = align;
+        self
+    }
+
+    pub fn color(mut self, color: Color) -> Self {
+        self.color = color;
         self
     }
 }
@@ -43,14 +48,13 @@ impl From<TextBuilder> for Text {
 
 impl Widget for Text {
     fn get_size(&self, ctx: Context) -> (f32, f32) {
-        let size_char = (5.5, 10.0);
+        let size_char = (5.5, 12.5);
         let mut width = (self.text.len() as f32) * size_char.0;
-        let mut height = size_char.1;
+        let height = size_char.1;
 
-        // break 1 line for now
+        // TODO(marc2332) break lines
         if width > ctx.width {
             width = ctx.width;
-            height *= 2.0;
         }
 
         (width, height)
@@ -69,16 +73,5 @@ impl Widget for Text {
         let y = ctx.y + 9.0;
 
         canvas.draw_str_align(&self.text, (x, y), &font, &paint, self.align);
-    }
-}
-
-impl StyledWidget for TextBuilder {
-    fn background(mut self, color: Color) -> Self {
-        self
-    }
-
-    fn color(mut self, color: Color) -> Self {
-        self.color = color;
-        self
     }
 }

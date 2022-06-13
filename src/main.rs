@@ -1,4 +1,9 @@
-fn root() -> impl Widget {
+#![cfg_attr(
+    all(not(debug_assertions), target_os = "windows"),
+    windows_subsystem = "windows"
+)]
+
+fn stuff() -> impl Widget {
     Stateful::new(|_ctx| {
         Box::new(Padding::from(
             PaddingBuilder::new((0.0, 0.0, 0.0, 0.0)).child(List::from(
@@ -9,10 +14,19 @@ fn root() -> impl Widget {
                     .child(Button::from(
                         ButtonBuilder::new()
                             .background(Color::RED)
+                            .child(Expand::from(ExpandBuilder::new().child(Text::from(
+                                TextBuilder::new("Expanded").color(Color::from_rgb(240, 240, 240)),
+                            )))),
+                    ))
+                    .child(Button::from(
+                        ButtonBuilder::new()
+                            .background(Color::BLUE)
                             .child(Text::from(
-                                TextBuilder::new("Hello world")
+                                TextBuilder::new("Fixed width and height")
                                     .color(Color::from_rgb(240, 240, 240)),
-                            )),
+                            ))
+                            .width(200.0)
+                            .height(50.0),
                     ))
                     .child(Padding::from(
                         PaddingBuilder::new((0.0, 0.0, 0.0, 0.0)).child(Button::from(
@@ -21,7 +35,7 @@ fn root() -> impl Widget {
                                 .child(Padding::from(
                                     PaddingBuilder::new((50.0, 50.0, 25.0, 25.0)).child(
                                         Text::from(
-                                            TextBuilder::new("wooooow").color(Color::YELLOW),
+                                            TextBuilder::new("Fixed paddings").color(Color::YELLOW),
                                         ),
                                     ),
                                 )),
@@ -31,10 +45,16 @@ fn root() -> impl Widget {
                         PaddingBuilder::new((10.0, 10.0, 10.0, 10.0)).child(Button::from(
                             ButtonBuilder::new()
                                 .background(Color::GREEN)
-                                .child(Padding::from(
-                                    PaddingBuilder::new((50.0, 50.0, 50.0, 50.0)).child(
-                                        Text::from(TextBuilder::new("marc").color(Color::BLACK)),
-                                    ),
+                                .child(Expand::from(
+                                    ExpandBuilder::new().child(Center::from(
+                                        CenterBuilder::new().child(Text::from(
+                                            TextBuilder::new(
+                                                "Expanded horizontally + centered + paddings",
+                                            )
+                                            .color(Color::BLACK)
+                                            .align(Align::Center),
+                                        )),
+                                    )),
                                 )),
                         )),
                     ))
@@ -42,13 +62,23 @@ fn root() -> impl Widget {
                         ButtonBuilder::new()
                             .background(Color::MAGENTA)
                             .child(Expand::from(
-                                ExpandBuilder::new().child(Center::from(
-                                    CenterBuilder::new().child(Text::from(
-                                        TextBuilder::new("Expanded and centered")
-                                            .color(Color::WHITE)
-                                            .set_align(Align::Center),
-                                    )),
-                                )),
+                                ExpandBuilder::new()
+                                    .child(Center::from(
+                                        CenterBuilder::new()
+                                            .child(List::from(
+                                                ListBuilder::new()
+                                                    .child(Text::from(
+                                                        TextBuilder::new(
+                                                            "Expanded both sides and centered",
+                                                        )
+                                                        .color(Color::BLACK)
+                                                        .align(Align::Center),
+                                                    ))
+                                                    .child(Triangle::from(TriangleBuilder::new())),
+                                            ))
+                                            .direction(Direction::Both),
+                                    ))
+                                    .direction(Direction::Both),
                             )),
                     )),
             )),
@@ -60,29 +90,29 @@ fn main() {
     yalem::run(
         App::new().with_window(
             Window::new()
-                .with_title("A")
-                .root(root()),
+                .with_title("Yalum Demo")
+                .root(stuff()),
         ),
     )
 }
 
 use button::{Button, ButtonBuilder};
-use center::{Center, CenterBuilder};
+use center::{Center, CenterBuilder, Direction};
 use expand::{Expand, ExpandBuilder};
 use glutin::event_loop::EventLoopProxy;
 
 use list::{List, ListBuilder};
 use padding::{Padding, PaddingBuilder};
 use skia_safe::{utils::text_utils::Align, Canvas, Color};
-use stateful::{Stateful};
+use stateful::Stateful;
 use text::{Text, TextBuilder};
+use triangle::{Triangle, TriangleBuilder};
 
 mod button;
 mod center;
 mod expand;
 mod list;
 mod padding;
-mod renderer;
 mod stateful;
 mod text;
 mod triangle;
@@ -98,15 +128,9 @@ pub struct Context {
 pub trait Widget {
     fn draw(&mut self, canvas: &mut Canvas, context: Context);
 
-    fn get_size(&self, _ctx: Context) -> (f32, f32) {
-        (50.0, 50.0)
+    fn get_size(&self, ctx: Context) -> (f32, f32) {
+        (ctx.width, ctx.height)
     }
-}
-
-trait StyledWidget {
-    fn background(self, color: Color) -> Self;
-
-    fn color(self, color: Color) -> Self;
 }
 
 trait AppWindow {
@@ -271,7 +295,7 @@ mod yalem {
 
             windowed_context
                 .window()
-                .set_inner_size(PhysicalSize::<u32>::new(200, 200));
+                .set_inner_size(PhysicalSize::<u32>::new(300, 300));
 
             let surface = create_surface(&windowed_context, &fb_info, &mut gr_context);
             // let sf = windowed_context.window().scale_factor() as f32;

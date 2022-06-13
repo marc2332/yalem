@@ -1,25 +1,26 @@
-use skia_safe::{Canvas};
+use skia_safe::Canvas;
 
 use crate::{Context, Widget};
 
-pub struct StateContext {
-
-}
+pub struct StateContext {}
 
 impl StateContext {
     pub fn new() -> Self {
-        Self {  }
+        Self {}
     }
 }
 
 pub struct Stateful {
     render: fn(&StateContext) -> Box<dyn Widget>,
-    state_ctx: StateContext
+    state_ctx: StateContext,
 }
 
 impl Stateful {
-    pub fn new(render: fn(&StateContext) -> Box<dyn Widget> ) -> Self {
-        Self { render, state_ctx: StateContext::new() }
+    pub fn new(render: fn(&StateContext) -> Box<dyn Widget>) -> Self {
+        Self {
+            render,
+            state_ctx: StateContext::new(),
+        }
     }
 }
 
@@ -32,4 +33,3 @@ impl Widget for Stateful {
         (self.render)(&self.state_ctx).draw(canvas, ctx)
     }
 }
-

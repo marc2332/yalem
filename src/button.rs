@@ -1,19 +1,19 @@
 use skia_safe::{Canvas, Color, Paint, PaintStyle, Path};
 
-use crate::{Context, StyledWidget, Widget};
+use crate::{Context, Widget};
 
 pub struct Button {
     background_color: Color,
     child: Option<Box<dyn Widget>>,
-    width: f32,
-    height: f32,
+    width: Option<f32>,
+    height: Option<f32>,
 }
 
 pub struct ButtonBuilder {
     background_color: Color,
     child: Option<Box<dyn Widget>>,
-    width: f32,
-    height: f32,
+    width: Option<f32>,
+    height: Option<f32>,
 }
 
 impl ButtonBuilder {
@@ -21,8 +21,8 @@ impl ButtonBuilder {
         Self {
             background_color: Color::TRANSPARENT,
             child: None,
-            width: 5.0,
-            height: 5.0,
+            width: None,
+            height: None,
         }
     }
 
@@ -32,12 +32,17 @@ impl ButtonBuilder {
     }
 
     pub fn width(mut self, width: f32) -> Self {
-        self.width = width;
+        self.width = Some(width);
         self
     }
 
     pub fn height(mut self, height: f32) -> Self {
-        self.height = height;
+        self.height = Some(height);
+        self
+    }
+
+    pub fn background(mut self, color: Color) -> Self {
+        self.background_color = color;
         self
     }
 }
@@ -55,29 +60,24 @@ impl From<ButtonBuilder> for Button {
 
 impl Widget for Button {
     fn get_size(&self, ctx: Context) -> (f32, f32) {
-        let x = ctx.x;
-        let y = ctx.y;
-        let mut width = ctx.x;
-        let mut height = ctx.y;
-
-        let inner_x = x;
-        let inner_y = y;
+        let mut height = ctx.height;
+        let mut width = ctx.width;
 
         if let Some(child) = &self.child {
-            let size = child.get_size(Context {
-                x: inner_x,
-                y: inner_y,
-                width: ctx.width,
-                height: ctx.height,
-            });
-
-            size
-        } else {
-            width += self.width;
-            height += self.height;
-
-            (width, height)
+            let size = child.get_size(ctx.clone());
+            width = size.0;
+            height = size.1;
         }
+
+        if let Some(w) = self.width {
+            width = ctx.x + w;
+        }
+
+        if let Some(h) = self.height {
+            height = ctx.y + h;
+        }
+
+        (width, height)
     }
 
     fn draw(&mut self, canvas: &mut Canvas, ctx: Context) {
@@ -90,30 +90,22 @@ impl Widget for Button {
 
         let x = ctx.x;
         let y = ctx.y;
-        let mut width = ctx.x;
-        let mut height = ctx.y;
+        let mut width = ctx.width;
+        let mut height = ctx.height;
 
-        let inner_x = x;
-        let inner_y = y;
+        if let Some(child) = &self.child {
+            let size = child.get_size(ctx.clone());
+            width = ctx.x + size.0;
+            height = ctx.y + size.1;
+        }
 
-        let child_size = if let Some(child) = &self.child {
-            let size = child.get_size(Context {
-                x: inner_x,
-                y: inner_y,
-                width: ctx.width,
-                height: ctx.height,
-            });
+        if let Some(w) = self.width {
+            width = ctx.x + w;
+        }
 
-            width += size.0;
-            height += size.1;
-
-            Some(size)
-        } else {
-            width += self.width;
-            height += self.height;
-
-            None
-        };
+        if let Some(h) = self.height {
+            height = ctx.y + h;
+        }
 
         path.move_to((x, y));
         path.line_to((width, y));
@@ -124,27 +116,7 @@ impl Widget for Button {
         canvas.draw_path(&path, &paint);
 
         if let Some(child) = &mut self.child {
-            let size = child_size.unwrap();
-            child.draw(
-                canvas,
-                Context {
-                    x: inner_x,
-                    y: inner_y,
-                    width: size.0,
-                    height: size.1,
-                },
-            );
+            child.draw(canvas, ctx);
         }
-    }
-}
-
-impl StyledWidget for ButtonBuilder {
-    fn background(mut self, color: Color) -> Self {
-        self.background_color = color;
-        self
-    }
-
-    fn color(self, _color: Color) -> Self {
-        self
     }
 }

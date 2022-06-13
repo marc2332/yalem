@@ -1,6 +1,6 @@
 use skia_safe::{Canvas, Color};
 
-use crate::{Context, StyledWidget, Widget};
+use crate::{Context, Widget};
 
 pub struct Padding {
     pub(crate) left: f32,
@@ -50,12 +50,20 @@ impl From<PaddingBuilder> for Padding {
 impl Widget for Padding {
     fn get_size(&self, ctx: Context) -> (f32, f32) {
         let child = self.child.as_ref().unwrap();
-        let width = ctx.width + self.right + self.left;
-        let height = ctx.height + self.top + self.bottom;
+        let mut width = ctx.width - self.right - self.left;
+        let mut height = ctx.height - self.top - self.bottom;
+
+        if height > ctx.height {
+            height = ctx.height;
+        }
+
+        if width > ctx.width {
+            width = ctx.width;
+        }
 
         let child_size = child.get_size(Context {
-            x: ctx.x,
-            y: ctx.y,
+            x: ctx.x + self.left,
+            y: ctx.y + self.top,
             width,
             height,
         });
@@ -67,31 +75,27 @@ impl Widget for Padding {
     }
 
     fn draw(&mut self, canvas: &mut Canvas, ctx: Context) {
-        let x = ctx.x + self.left;
-        let y = ctx.y + self.top;
-        let width = ctx.width + self.right + self.left;
-        let height = ctx.height + self.top + self.bottom;
+        let mut width = ctx.width - self.right - self.left;
+        let mut height = ctx.height - self.top - self.bottom;
+
+        if height > ctx.height {
+            height = ctx.height;
+        }
+
+        if width > ctx.width {
+            width = ctx.width;
+        }
 
         if let Some(child) = &mut self.child {
             child.draw(
                 canvas,
                 Context {
-                    x,
-                    y,
+                    x: ctx.x + self.left,
+                    y: ctx.y + self.top,
                     width,
                     height,
                 },
             )
         }
-    }
-}
-
-impl StyledWidget for PaddingBuilder {
-    fn background(mut self, color: Color) -> Self {
-        self
-    }
-
-    fn color(mut self, color: Color) -> Self {
-        self
     }
 }

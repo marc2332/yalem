@@ -2,11 +2,10 @@ use std::cmp::min;
 
 use skia_safe::{Canvas, Color, Paint, PaintJoin, PaintStyle, Path};
 
-use crate::{Context, StyledWidget, Widget};
+use crate::{Context, Widget};
 
 const PI: f32 = std::f32::consts::PI;
 const DEGREES_IN_RADIANS: f32 = PI / 180.0;
-const PEN_SIZE: f32 = 1.0;
 
 #[derive(Clone)]
 pub struct Triangle {
@@ -20,11 +19,16 @@ pub struct TriangleBuilder {
 impl TriangleBuilder {
     pub fn new() -> Self {
         Self {
-            background_color: Color::TRANSPARENT,
+            background_color: Color::BLACK,
         }
     }
 
-    fn child(&mut self, child: impl Widget) -> &mut Self {
+    pub fn child(&mut self, child: impl Widget) -> &mut Self {
+        self
+    }
+
+    fn background(mut self, color: Color) -> Self {
+        self.background_color = color;
         self
     }
 }
@@ -38,6 +42,8 @@ impl From<TriangleBuilder> for Triangle {
 }
 
 impl Widget for Triangle {
+    // TODO(marc2332) implement get_size
+
     fn draw(&mut self, canvas: &mut Canvas, ctx: Context) {
         fn point_in_triangle(center: (f32, f32), radius: f32, radians: f32) -> (f32, f32) {
             (
@@ -46,12 +52,9 @@ impl Widget for Triangle {
             )
         }
 
-        let size = {
-            let dim = canvas.image_info().dimensions();
-            min(dim.width, dim.height) as i32
-        };
+        let size = min(ctx.width as i32, (ctx.height as i32) - 10) as i32;
 
-        let center = (size / 2, size / 2);
+        let center = (ctx.x, ctx.y + 10.0);
         let radius = size / 2 * 53 / 100;
 
         let c = (center.0 as f32, center.1 as f32);
@@ -62,7 +65,7 @@ impl Widget for Triangle {
         let mut path = Path::new();
         let mut paint = Paint::default();
         paint.set_anti_alias(true);
-        paint.set_stroke_width(PEN_SIZE.max(canvas.image_info().dimensions().width as f32 / 360.0));
+        paint.set_stroke_width(1.0);
         paint.set_style(PaintStyle::Stroke);
         paint.set_stroke_join(PaintJoin::Bevel);
 
@@ -78,15 +81,5 @@ impl Widget for Triangle {
         paint.set_color(self.background_color);
         path.close();
         canvas.draw_path(&path, &paint);
-    }
-}
-
-impl StyledWidget for TriangleBuilder {
-    fn background(mut self, color: Color) -> Self {
-        self.background_color = color;
-        self
-    }
-    fn color(mut self, color: Color) -> Self {
-        self
     }
 }
