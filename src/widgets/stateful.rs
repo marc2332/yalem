@@ -1,6 +1,6 @@
 use skia_safe::Canvas;
 
-use crate::{Context, Widget};
+use crate::{Context, Widget, YalemEvent};
 
 pub struct StateContext {}
 
@@ -25,14 +25,10 @@ impl Stateful {
 }
 
 impl Widget for Stateful {
-    /*
-
-        fn send_event(&self, event: &WindowEvent) {
-        if let Some(child) = &self.root {
-            child.send_event(&event)
-        }
+    fn send_event(&mut self, event: &YalemEvent) {
+        let mut child = (self.render)(&self.state_ctx);
+        child.send_event(&event);
     }
-    */
 
     fn get_size(&self, ctx: Context) -> (f32, f32) {
         (self.render)(&self.state_ctx).get_size(ctx)

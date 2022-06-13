@@ -1,6 +1,4 @@
-use skia_safe::{
-    utils::text_utils::Align, Canvas, Color, Font, FontStyle, Paint, PaintStyle, Path, TextBlob,
-};
+use skia_safe::{utils::text_utils::Align, Canvas, Color, Font, Paint, PaintStyle};
 
 use crate::{Context, Widget};
 
@@ -58,7 +56,7 @@ impl From<TextBuilder> for Text {
 
 impl Widget for Text {
     fn get_size(&self, ctx: Context) -> (f32, f32) {
-        let size_char = (5.5, 12.5);
+        let size_char = (6.0, 12.5);
         let mut width = (self.text.len() as f32) * size_char.0;
         let height = size_char.1;
 

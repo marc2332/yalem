@@ -1,5 +1,4 @@
-use glutin::event::WindowEvent;
-use skia_safe::{Canvas, Color};
+use skia_safe::Canvas;
 
 use crate::{Context, Widget, YalemEvent};
 

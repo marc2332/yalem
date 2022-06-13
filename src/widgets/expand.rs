@@ -1,7 +1,6 @@
-use glutin::event::WindowEvent;
-use skia_safe::{Canvas, Color};
+use skia_safe::Canvas;
 
-use crate::{center::Direction, Context, Widget, YalemEvent};
+use crate::{widgets::*, Context, Widget, YalemEvent};
 
 pub struct Expand {
     child: Option<Box<dyn Widget>>,

@@ -23,10 +23,7 @@ impl TriangleBuilder {
         }
     }
 
-    pub fn child(&mut self, child: impl Widget) -> &mut Self {
-        self
-    }
-
+    #[allow(dead_code)]
     fn background(mut self, color: Color) -> Self {
         self.background_color = color;
         self

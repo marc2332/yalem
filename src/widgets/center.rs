@@ -1,9 +1,6 @@
-use std::borrow::Borrow;
+use skia_safe::Canvas;
 
-use glutin::event::WindowEvent;
-use skia_safe::{Canvas, Color};
-
-use crate::{padding::Padding, Context, Widget, YalemEvent};
+use crate::{widgets::*, Context, Widget, YalemEvent};
 
 pub enum Direction {
     Horizontal,

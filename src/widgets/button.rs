@@ -1,4 +1,4 @@
-use glutin::event::{ElementState, MouseButton, WindowEvent};
+use glutin::event::MouseButton;
 use skia_safe::{Canvas, Color, Paint, PaintStyle, Path};
 
 use crate::{Context, Widget, YalemEvent, YalemMouse};
