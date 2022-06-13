@@ -1,4 +1,5 @@
-# yalem ✨ - Experimental UI Library for Rust
+# ⛑️ yalem   
+## Experimental UI Library for Rust
 
 > Note: I made this in just a couple of days so, don't expect high quality code <3. I don't think this will come out as something usable, I am not **that** experienced making this kind of libraries.
 
@@ -13,7 +14,7 @@ Supported Widgets:
 - Stateful
 - Text
 
-### Examples
+## Examples
 
 [![Example of different layouts](./screenshot1.png)](./screenshot1.png)
 [![Example of a counter](./screenshot2.png)](./screenshot2.png)
